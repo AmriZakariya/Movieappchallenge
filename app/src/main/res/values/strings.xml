@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">Movie app challenge</string>
+    <string name="top_rated">Top Rated</string>
+    <string name="popular">Pouplar</string>
+    <string name="title">Title</string>
+    <string name="overview">Overview</string>
+    <string name="no_movies">No movies found</string>
 </resources>
