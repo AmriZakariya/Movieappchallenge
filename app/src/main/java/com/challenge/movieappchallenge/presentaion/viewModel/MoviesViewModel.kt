@@ -24,11 +24,24 @@ class MoviesViewModel @Inject constructor(private val movieUseCase: MovieUseCase
     private val _moviesFlow = MutableStateFlow<PagingData<Movie>>(PagingData.empty())
     val moviesList: StateFlow<PagingData<Movie>> = _moviesFlow
 
+    val searchQuery: Channel<String> = Channel(capacity = Channel.UNLIMITED)
     val moviesType: Channel<MoviesType> = Channel(capacity = Channel.UNLIMITED)
     val refreshData: Channel<Boolean> = Channel(capacity = Channel.UNLIMITED)
 
 
     init {
+        viewModelScope.launch {
+            searchQuery.consumeAsFlow()
+                .distinctUntilChanged()
+                .collectLatest { searchQuery ->
+                    if (searchQuery.isEmpty()) {
+                        getMovies(MoviesType.POPULAR)
+                    } else {
+                        searchMovies(searchQuery)
+                    }
+                }
+
+        }
         viewModelScope.launch {
             moviesType.consumeAsFlow()
                 .distinctUntilChanged()
@@ -57,6 +70,14 @@ class MoviesViewModel @Inject constructor(private val movieUseCase: MovieUseCase
                 MoviesType.POPULAR -> movieUseCase.getMostPopularMovies()
             }.cachedIn(viewModelScope)
 
+            _moviesFlow.emit(moviesResult.first())
+        }
+    }
+
+    private suspend fun searchMovies(query: String) {
+        // Get the Movies if there are no movies in the flow
+        viewModelScope.launch {
+            val moviesResult = movieUseCase.searchMovies(query).cachedIn(viewModelScope)
             _moviesFlow.emit(moviesResult.first())
         }
     }

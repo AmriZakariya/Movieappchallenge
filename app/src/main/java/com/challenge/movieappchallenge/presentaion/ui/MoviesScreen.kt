@@ -27,6 +27,7 @@ import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
@@ -44,6 +45,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
@@ -55,7 +57,6 @@ import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.paging.LoadState
@@ -69,7 +70,7 @@ import com.challenge.movieappchallenge.R
 import com.challenge.movieappchallenge.domain.models.Movie
 import com.challenge.movieappchallenge.presentaion.models.MoviesType
 import com.challenge.movieappchallenge.presentaion.util.compose.items
-import com.challenge.movieappchallenge.presentaion.util.toRateColor
+import com.challenge.movieappchallenge.presentaion.util.roundFirstDigitString
 import com.challenge.movieappchallenge.presentaion.viewModel.MoviesViewModel
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
@@ -89,6 +90,9 @@ fun MoviesScreen(
     // Request the movies from VM
     moviesViewModel.moviesType.trySend(movieType)
 
+    var searchQuery by remember { mutableStateOf("") }
+    moviesViewModel.searchQuery.trySend(searchQuery)
+
     Scaffold(
         modifier = Modifier
             .testTag("movies_screen")
@@ -101,9 +105,13 @@ fun MoviesScreen(
         },
         content = {
             it.toString()
-            MoviesContent(moviesViewModel.moviesList, onMovieClicked, onRefresh = {
-                moviesViewModel.refreshData.trySend(true)
-            })
+            Column {
+                SearchInput(onSearchClicked = { searchQuery = it })
+                MoviesContent(moviesViewModel.moviesList, onMovieClicked, onRefresh = {
+                    moviesViewModel.refreshData.trySend(true)
+                })
+            }
+
         })
 }
 
@@ -220,17 +228,16 @@ fun MoviesList(moviesFlow: Flow<PagingData<Movie>>, onMovieClicked: (Movie) -> U
                 start = 8.dp,
                 top = 8.dp,
                 end = 8.dp,
-                bottom = 8.dp
+                bottom = 32.dp
             ),
         ) {
             // Movies items
             items(moviesItems) { movie ->
                 MovieItem(movie, onMovieClicked)
             }
-            //Footer
-            /*item {
+            item {
                 ShowLoadingProgress(moviesItems.loadState.refresh)
-            }*/
+            }
 
         }
     }
@@ -292,6 +299,7 @@ fun MovieItem(movie: Movie?, onMovieClicked: (Movie) -> Unit) {
         Column(
             Modifier
                 .clip(RoundedCornerShape(12.dp))
+                .padding(bottom = 30.dp)
                 .clickable {
                     onMovieClicked(movie)
                 },
@@ -301,7 +309,7 @@ fun MovieItem(movie: Movie?, onMovieClicked: (Movie) -> Unit) {
             MovieImage(movie.imageUrlFull)
             Row {
                 VoteAverage(review = movie.voteAverage, icon = R.drawable.star)
-                Spacer(modifier = Modifier.width(8.dp))
+                Spacer(modifier = Modifier.width(10.dp))
                 VoteCount(count = movie.voteCount, icon = R.drawable.user)
             }
             Text(
@@ -311,34 +319,6 @@ fun MovieItem(movie: Movie?, onMovieClicked: (Movie) -> Unit) {
                 overflow = TextOverflow.Ellipsis
             )
         }
-    }
-}
-
-@Composable
-fun MovieImageRate(movie: Movie) {
-    Box {
-        MovieImage(movie.imageUrlSmall)
-        MovieRateBadge(movie.voteAverage, Modifier.align(Alignment.TopEnd))
-    }
-}
-
-@Composable
-fun MovieRateBadge(voteAverage: Double, Modifier: Modifier, textSze: TextUnit = 16.sp) {
-    Box(
-        modifier = Modifier
-            .clip(RoundedCornerShape(50))
-            .background(voteAverage.toRateColor())
-
-    ) {
-        Text(
-            modifier = Modifier
-                .padding(4.dp),
-            text = voteAverage.toString(),
-            fontSize = textSze,
-            color = Color.White,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis
-        )
     }
 }
 
@@ -423,8 +403,8 @@ fun VoteAverage(review: Double, icon: Int?) {
                 .width(24.dp)
                 .padding(4.dp)
         )
-        Spacer(modifier = Modifier.width(8.dp))
-        Text(text = review.toString())
+        Spacer(modifier = Modifier.width(2.dp))
+        Text(text = review.roundFirstDigitString())
     }
 }
 
@@ -436,9 +416,30 @@ fun VoteCount(count: Int, icon: Int?) {
             contentDescription = null, // Provide appropriate content description
             modifier = Modifier
                 .width(24.dp)
-                .padding(4.dp)
+                .padding(4.dp),
+            colorFilter = ColorFilter.tint(MaterialTheme.colors.onPrimary) // Specify the tint color
         )
-        Spacer(modifier = Modifier.width(8.dp))
+        Spacer(modifier = Modifier.width(2.dp))
         Text(text = count.toString())
+    }
+}
+
+
+@Composable
+fun SearchInput(onSearchClicked: (String) -> Unit) {
+    val searchTextState = remember { mutableStateOf("") }
+
+    Column(modifier = Modifier.fillMaxWidth()) {
+        OutlinedTextField(
+            value = searchTextState.value,
+            onValueChange = { searchTextState.value = it },
+            label = { Text("Search") },
+            singleLine = true,
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        // You can add a button here to trigger the search
+        // For simplicity, let's just call onSearchClicked when the text changes
+        onSearchClicked(searchTextState.value)
     }
 }

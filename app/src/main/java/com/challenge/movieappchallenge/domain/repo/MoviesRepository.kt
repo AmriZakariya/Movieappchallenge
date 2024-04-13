@@ -11,4 +11,9 @@ interface MoviesRepository {
     suspend fun getTopRatedMovies(): Pager<Int, MoviesRemoteResponse.Movie>
 
     suspend fun getCachedPopularMovies(): Pager<Int, MovieLocal>
+
+    suspend fun searchMovies(query: String): Pager<Int, MoviesRemoteResponse.Movie>
+
+    suspend fun searchCachedMovies(query: String): Pager<Int, MovieLocal>
+
 }

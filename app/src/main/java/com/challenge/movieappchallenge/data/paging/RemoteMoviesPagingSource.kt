@@ -15,6 +15,7 @@ private const val TAG = "MoviesPagingSource"
 enum class MoviesType {
     POPULAR,
     TOP_RATED,
+    SEARCH,
     NONE
 }
 
@@ -25,6 +26,7 @@ class RemoteMoviesPagingSource(
     private var moviesType: MoviesType = MoviesType.NONE,
     private var forceCashing: Boolean = false,
     private val cachingPagesNum: List<Int> = cachedPages,
+    private var searchQuery: String = ""
 ) : PagingSource<Int, MoviesRemoteResponse.Movie>() {
 
     fun setForceCaching(isCache: Boolean) {
@@ -35,6 +37,10 @@ class RemoteMoviesPagingSource(
         this.moviesType = moviesType
     }
 
+    fun setSearchQuery(query: String) {
+        this.searchQuery = query
+    }
+
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, MoviesRemoteResponse.Movie> {
         return try {
             val currentPage = params.key ?: firstPage
@@ -43,6 +49,7 @@ class RemoteMoviesPagingSource(
             val moviesList = when (moviesType) {
                 MoviesType.POPULAR -> retrofitApi.getPopularMovies(currentPage).movies
                 MoviesType.TOP_RATED -> retrofitApi.getTopRatedMovies(currentPage).movies
+                MoviesType.SEARCH -> retrofitApi.searchMovies(searchQuery, currentPage).movies
                 MoviesType.NONE -> {
                     throw IllegalArgumentException(
                         "Parameter MoviesType Not passed",

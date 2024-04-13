@@ -34,3 +34,7 @@ fun Double.toRate(): RateType {
 fun Double.roundFirstDigit(): Double {
     return String.format("%.1f", this).toDouble()
 }
+
+fun Double.roundFirstDigitString(): String {
+    return String.format("%.1f", this)
+}

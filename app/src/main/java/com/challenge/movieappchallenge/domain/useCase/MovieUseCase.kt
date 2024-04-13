@@ -10,4 +10,6 @@ interface MovieUseCase {
     suspend fun getTopRatedMovies(): Flow<PagingData<Movie>>
 
     suspend fun getMostPopularMovies(): Flow<PagingData<Movie>>
+
+    suspend fun searchMovies(query: String): Flow<PagingData<Movie>>
 }

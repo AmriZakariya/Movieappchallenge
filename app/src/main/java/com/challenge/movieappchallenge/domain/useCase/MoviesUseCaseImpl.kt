@@ -47,4 +47,22 @@ class MoviesUseCaseImpl @Inject constructor(
         return movies.distinctUntilChanged()
     }
 
+    override suspend fun searchMovies(query: String): Flow<PagingData<Movie>> {
+        Logger.i(TAG, networkState.isOnline().toString())
+        val movies = if (networkState.isOnline()) {
+            moviesRepository.searchMovies(query).flow.map { moviesList ->
+                moviesList.map { movie ->
+                    movie.toMovie()
+                }
+            }
+        } else {
+            moviesRepository.searchCachedMovies(query).flow.map { moviesList ->
+                moviesList.map { movie ->
+                    movie.toMovie()
+                }
+            }
+        }
+        return movies.distinctUntilChanged()
+    }
+
 }

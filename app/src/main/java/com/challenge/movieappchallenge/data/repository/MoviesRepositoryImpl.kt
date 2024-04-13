@@ -59,4 +59,26 @@ class MoviesRepositoryImpl @Inject constructor(
             })
         }
 
+    override suspend fun searchMovies(query: String): Pager<Int, MoviesRemoteResponse.Movie> =
+        withContext(dispatcher) {
+            remoteMoviesPagingSource.setSearchQuery(query)
+            remoteMoviesPagingSource.setMoviesType(MoviesType.SEARCH)
+            remoteMoviesPagingSource.setForceCaching(false)
+            return@withContext Pager(config = PagingConfig(
+                pageSize = PAGE_SIZE_PAGING_REMOTE_MOVIE,
+                enablePlaceholders = false
+            ), pagingSourceFactory = {
+                remoteMoviesPagingSource
+            })
+        }
+
+    override suspend fun searchCachedMovies(query: String): Pager<Int, MovieLocal> =
+        withContext(dispatcher) {
+            return@withContext Pager(config = PagingConfig(
+                pageSize = PAGE_SIZE_PAGING_LOCAL_MOVIE,
+                enablePlaceholders = false
+            ), pagingSourceFactory = {
+                moviesLocalPagingSource
+            })
+        }
 }

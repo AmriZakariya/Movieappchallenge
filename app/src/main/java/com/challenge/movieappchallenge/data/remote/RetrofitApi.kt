@@ -12,4 +12,10 @@ interface RetrofitApi {
     @GET("/3/movie/top_rated")
     suspend fun getTopRatedMovies(@Query("page") page: Int): MoviesRemoteResponse
 
+    @GET("/3/search/movie")
+    suspend fun searchMovies(
+        @Query("query") query: String,
+        @Query("page") page: Int
+    ): MoviesRemoteResponse
+
 }
