@@ -1,6 +1,14 @@
 ## Movie App - Android Application challenge
 
-[//]: # (<img src="app_preview.png" height="500"/>)
+## Demo
+
+<p>
+  <img src="img/demo.gif" height="500" width="250">
+</p>
+
+## APK Download
+
+[Click here](https://file.io/cmO2qCQupC8m)
 
 ### Libraries
 
