@@ -3,6 +3,7 @@ package com.challenge.movieappchallenge.domain.repo
 import androidx.paging.Pager
 import com.challenge.movieappchallenge.data.models.MovieLocal
 import com.challenge.movieappchallenge.data.models.MoviesRemoteResponse
+import com.challenge.movieappchallenge.presentaion.models.SortingValue
 
 interface MoviesRepository {
 
@@ -14,6 +15,6 @@ interface MoviesRepository {
 
     suspend fun searchMovies(query: String): Pager<Int, MoviesRemoteResponse.Movie>
 
-    suspend fun searchCachedMovies(query: String): Pager<Int, MovieLocal>
+    suspend fun sortMovies(sortingValue: SortingValue): Pager<Int, MoviesRemoteResponse.Movie>
 
 }

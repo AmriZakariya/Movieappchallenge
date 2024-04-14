@@ -10,6 +10,7 @@ import com.challenge.movieappchallenge.data.paging.RemoteMoviesPagingSource
 import com.challenge.movieappchallenge.data.util.PAGE_SIZE_PAGING_LOCAL_MOVIE
 import com.challenge.movieappchallenge.data.util.PAGE_SIZE_PAGING_REMOTE_MOVIE
 import com.challenge.movieappchallenge.domain.repo.MoviesRepository
+import com.challenge.movieappchallenge.presentaion.models.SortingValue
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -72,13 +73,15 @@ class MoviesRepositoryImpl @Inject constructor(
             })
         }
 
-    override suspend fun searchCachedMovies(query: String): Pager<Int, MovieLocal> =
+    override suspend fun sortMovies(sortingValue: SortingValue): Pager<Int, MoviesRemoteResponse.Movie> =
         withContext(dispatcher) {
+            remoteMoviesPagingSource.setSortingValue(sortingValue)
+            remoteMoviesPagingSource.setForceCaching(false)
             return@withContext Pager(config = PagingConfig(
-                pageSize = PAGE_SIZE_PAGING_LOCAL_MOVIE,
+                pageSize = PAGE_SIZE_PAGING_REMOTE_MOVIE,
                 enablePlaceholders = false
             ), pagingSourceFactory = {
-                moviesLocalPagingSource
+                remoteMoviesPagingSource
             })
         }
 }

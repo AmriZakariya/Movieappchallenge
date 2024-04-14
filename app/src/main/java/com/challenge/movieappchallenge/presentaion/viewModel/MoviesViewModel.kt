@@ -7,6 +7,7 @@ import androidx.paging.cachedIn
 import com.challenge.movieappchallenge.domain.models.Movie
 import com.challenge.movieappchallenge.domain.useCase.MovieUseCase
 import com.challenge.movieappchallenge.presentaion.models.MoviesType
+import com.challenge.movieappchallenge.presentaion.models.SortingValue
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -27,9 +28,18 @@ class MoviesViewModel @Inject constructor(private val movieUseCase: MovieUseCase
     val searchQuery: Channel<String> = Channel(capacity = Channel.UNLIMITED)
     val moviesType: Channel<MoviesType> = Channel(capacity = Channel.UNLIMITED)
     val refreshData: Channel<Boolean> = Channel(capacity = Channel.UNLIMITED)
+    val sortingValue: Channel<SortingValue> = Channel(capacity = Channel.UNLIMITED)
 
 
     init {
+        viewModelScope.launch {
+            sortingValue.consumeAsFlow()
+                .distinctUntilChanged()
+                .collectLatest { sortingValue ->
+                    sortMovies(sortingValue)
+                }
+
+        }
         viewModelScope.launch {
             searchQuery.consumeAsFlow()
                 .distinctUntilChanged()
@@ -78,6 +88,14 @@ class MoviesViewModel @Inject constructor(private val movieUseCase: MovieUseCase
         // Get the Movies if there are no movies in the flow
         viewModelScope.launch {
             val moviesResult = movieUseCase.searchMovies(query).cachedIn(viewModelScope)
+            _moviesFlow.emit(moviesResult.first())
+        }
+    }
+
+    private suspend fun sortMovies(sortingValue: SortingValue) {
+        // Get the Movies if there are no movies in the flow
+        viewModelScope.launch {
+            val moviesResult = movieUseCase.sortMovies(sortingValue).cachedIn(viewModelScope)
             _moviesFlow.emit(moviesResult.first())
         }
     }

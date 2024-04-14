@@ -8,6 +8,7 @@ import com.challenge.movieappchallenge.data.models.MoviesRemoteResponse
 import com.challenge.movieappchallenge.data.remote.RetrofitApi
 import com.challenge.movieappchallenge.data.util.INITIAL_PAGE
 import com.challenge.movieappchallenge.data.util.cachedPages
+import com.challenge.movieappchallenge.presentaion.models.SortingValue
 import com.challenge.movieappchallenge.util.Logger
 
 private const val TAG = "MoviesPagingSource"
@@ -26,7 +27,8 @@ class RemoteMoviesPagingSource(
     private var moviesType: MoviesType = MoviesType.NONE,
     private var forceCashing: Boolean = false,
     private val cachingPagesNum: List<Int> = cachedPages,
-    private var searchQuery: String = ""
+    private var searchQuery: String = "",
+    private var sortingValue: SortingValue? = null
 ) : PagingSource<Int, MoviesRemoteResponse.Movie>() {
 
     fun setForceCaching(isCache: Boolean) {
@@ -41,15 +43,32 @@ class RemoteMoviesPagingSource(
         this.searchQuery = query
     }
 
+    fun setSortingValue(sortingValue: SortingValue) {
+        this.sortingValue = sortingValue
+    }
+
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, MoviesRemoteResponse.Movie> {
         return try {
             val currentPage = params.key ?: firstPage
 
             Logger.i(TAG, "current_movie_page:: $currentPage")
             val moviesList = when (moviesType) {
-                MoviesType.POPULAR -> retrofitApi.getPopularMovies(currentPage).movies
-                MoviesType.TOP_RATED -> retrofitApi.getTopRatedMovies(currentPage).movies
-                MoviesType.SEARCH -> retrofitApi.searchMovies(searchQuery, currentPage).movies
+                MoviesType.POPULAR -> retrofitApi.getPopularMovies(
+                    currentPage,
+                    sortingValue?.sortByValue
+                ).movies
+
+                MoviesType.TOP_RATED -> retrofitApi.getTopRatedMovies(
+                    currentPage,
+                    sortingValue?.sortByValue
+                ).movies
+
+                MoviesType.SEARCH -> retrofitApi.searchMovies(
+                    searchQuery,
+                    currentPage,
+                    sortingValue?.sortByValue
+                ).movies
+
                 MoviesType.NONE -> {
                     throw IllegalArgumentException(
                         "Parameter MoviesType Not passed",

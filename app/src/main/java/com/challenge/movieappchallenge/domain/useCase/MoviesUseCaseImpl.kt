@@ -5,6 +5,7 @@ import androidx.paging.map
 import com.challenge.movieappchallenge.data.mappers.movie.toMovie
 import com.challenge.movieappchallenge.domain.models.Movie
 import com.challenge.movieappchallenge.domain.repo.MoviesRepository
+import com.challenge.movieappchallenge.presentaion.models.SortingValue
 import com.challenge.movieappchallenge.util.Logger
 import com.challenge.movieappchallenge.util.NetworkState
 import kotlinx.coroutines.flow.Flow
@@ -48,21 +49,19 @@ class MoviesUseCaseImpl @Inject constructor(
     }
 
     override suspend fun searchMovies(query: String): Flow<PagingData<Movie>> {
-        Logger.i(TAG, networkState.isOnline().toString())
-        val movies = if (networkState.isOnline()) {
-            moviesRepository.searchMovies(query).flow.map { moviesList ->
-                moviesList.map { movie ->
-                    movie.toMovie()
-                }
+        return moviesRepository.searchMovies(query).flow.map { moviesList ->
+            moviesList.map { movie ->
+                movie.toMovie()
             }
-        } else {
-            moviesRepository.searchCachedMovies(query).flow.map { moviesList ->
-                moviesList.map { movie ->
-                    movie.toMovie()
-                }
+        }.distinctUntilChanged()
+    }
+
+    override suspend fun sortMovies(sortingValue: SortingValue): Flow<PagingData<Movie>> {
+        return moviesRepository.sortMovies(sortingValue).flow.map { moviesList ->
+            moviesList.map { movie ->
+                movie.toMovie()
             }
-        }
-        return movies.distinctUntilChanged()
+        }.distinctUntilChanged()
     }
 
 }

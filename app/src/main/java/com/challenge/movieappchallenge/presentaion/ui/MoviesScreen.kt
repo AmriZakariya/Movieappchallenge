@@ -33,6 +33,8 @@ import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForward
+import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -69,6 +71,7 @@ import coil.request.ImageRequest
 import com.challenge.movieappchallenge.R
 import com.challenge.movieappchallenge.domain.models.Movie
 import com.challenge.movieappchallenge.presentaion.models.MoviesType
+import com.challenge.movieappchallenge.presentaion.models.SortingValue
 import com.challenge.movieappchallenge.presentaion.util.compose.items
 import com.challenge.movieappchallenge.presentaion.util.roundFirstDigitString
 import com.challenge.movieappchallenge.presentaion.viewModel.MoviesViewModel
@@ -83,15 +86,14 @@ fun MoviesScreen(
     moviesViewModel: MoviesViewModel,
     onMovieClicked: (Movie) -> Unit = {},
 ) {
-    // Handle config changes by saving MoviesType
-    var movieType by rememberSaveable {
-        mutableStateOf(MoviesType.POPULAR)
-    }
-    // Request the movies from VM
+    var movieType by rememberSaveable { mutableStateOf(MoviesType.POPULAR) }
     moviesViewModel.moviesType.trySend(movieType)
 
-    var searchQuery by remember { mutableStateOf("") }
+    var searchQuery by rememberSaveable { mutableStateOf("") }
     moviesViewModel.searchQuery.trySend(searchQuery)
+
+    var sortingValue by rememberSaveable { mutableStateOf(SortingValue.ALPHABETICAL) }
+    moviesViewModel.sortingValue.trySend(sortingValue)
 
     Scaffold(
         modifier = Modifier
@@ -101,7 +103,14 @@ fun MoviesScreen(
             }
             .background(MaterialTheme.colors.background),
         topBar = {
-            TopBar { type -> movieType = type }
+            TopBar(
+                onFilterItemClicked = {
+                    movieType = it
+                },
+                onSortingItemCLicked = {
+                    sortingValue = it
+                }
+            )
         },
         content = {
             it.toString()
@@ -158,11 +167,15 @@ fun MoviesUiStates(moviesItems: LazyPagingItems<Movie>) {
 
 @Preview(showBackground = true)
 @Composable
-fun TopBar(onFilterItemClicked: (MoviesType) -> Unit = {}) {
+fun TopBar(
+    onFilterItemClicked: (MoviesType) -> Unit = {},
+    onSortingItemCLicked: (SortingValue) -> Unit = {}
+) {
     TopAppBar(modifier = Modifier.semantics { contentDescription = "Movies_app_bar" }, title = {
         Title()
     }, actions = {
         AppBarActions(onFilterItemClicked)
+        AppBarSortingAction(onSortingItemCLicked)
     })
 
 }
@@ -197,6 +210,42 @@ fun AppBarActions(onFilterItemClicked: (MoviesType) -> Unit) {
             Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                 Icon(imageVector = Icons.Filled.ArrowForward, contentDescription = null)
                 Text(text = stringResource(id = R.string.popular))
+            }
+        }
+    }
+}
+
+
+@Composable
+fun AppBarSortingAction(onSortingItemCLicked: (SortingValue) -> Unit) {
+    var mSortingState by remember { mutableStateOf(false) }
+    SortIcon(onFilterClicked = {
+        mSortingState = !mSortingState
+    })
+    // Creating a dropdown menu
+    DropdownMenu(
+        modifier = Modifier.semantics { contentDescription = "popup_menu" },
+        expanded = mSortingState,
+        onDismissRequest = { mSortingState = false }
+    ) {
+
+        DropdownMenuItem(onClick = {
+            onSortingItemCLicked(SortingValue.ALPHABETICAL)
+            mSortingState = false
+        }) {
+            Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                Icon(imageVector = Icons.Filled.Menu, contentDescription = null)
+                Text(text = stringResource(id = R.string.sorting_alphabetical))
+            }
+        }
+
+        DropdownMenuItem(onClick = {
+            onSortingItemCLicked(SortingValue.DATE)
+            mSortingState = false
+        }) {
+            Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                Icon(imageVector = Icons.Filled.DateRange, contentDescription = null)
+                Text(text = stringResource(id = R.string.sorting_date))
             }
         }
     }
@@ -378,9 +427,36 @@ fun DotsIcon(
         contentAlignment = Alignment.Center
     ) {
         Icon(
-            painter = painterResource(id = R.drawable.ic_filter_list),
+            painter = painterResource(id = R.drawable.filter),
             tint = MaterialTheme.colors.secondary,
-            contentDescription = null
+            contentDescription = null,
+            modifier = Modifier.size(20.dp)
+        )
+    }
+}
+
+
+@Composable
+fun SortIcon(
+    onFilterClicked: () -> Unit,
+    size: Dp = 50.dp
+) {
+    Box(
+        modifier = Modifier
+            .semantics { contentDescription = "sort_icon" }
+            .size(size)
+            .clip(RoundedCornerShape(50))
+            .padding(4.dp)
+            .clickable {
+                onFilterClicked()
+            },
+        contentAlignment = Alignment.Center
+    ) {
+        Icon(
+            painter = painterResource(id = R.drawable.sorting),
+            tint = MaterialTheme.colors.secondary,
+            contentDescription = null,
+            modifier = Modifier.size(26.dp)
         )
     }
 }

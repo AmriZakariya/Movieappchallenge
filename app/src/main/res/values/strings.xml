@@ -5,4 +5,6 @@
     <string name="title">Title</string>
     <string name="overview">Overview</string>
     <string name="no_movies">No movies found</string>
+    <string name="sorting_alphabetical">Alphabetical</string>
+    <string name="sorting_date">Date</string>
 </resources>
