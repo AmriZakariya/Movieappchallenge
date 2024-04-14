@@ -435,7 +435,6 @@ fun DotsIcon(
     }
 }
 
-
 @Composable
 fun SortIcon(
     onFilterClicked: () -> Unit,
@@ -474,7 +473,7 @@ fun VoteAverage(review: Double, icon: Int?) {
     Row {
         Image(
             painter = painterResource(id = icon ?: R.drawable.star),
-            contentDescription = null, // Provide appropriate content description
+            contentDescription = null,
             modifier = Modifier
                 .width(24.dp)
                 .padding(4.dp)
@@ -500,7 +499,6 @@ fun VoteCount(count: Int, icon: Int?) {
     }
 }
 
-
 @Composable
 fun SearchInput(onSearchClicked: (String) -> Unit) {
     val searchTextState = remember { mutableStateOf("") }
@@ -514,8 +512,6 @@ fun SearchInput(onSearchClicked: (String) -> Unit) {
             modifier = Modifier.fillMaxWidth()
         )
 
-        // You can add a button here to trigger the search
-        // For simplicity, let's just call onSearchClicked when the text changes
         onSearchClicked(searchTextState.value)
     }
 }

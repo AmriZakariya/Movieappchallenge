@@ -15,16 +15,16 @@ import com.challenge.movieappchallenge.presentaion.viewModel.MoviesViewModel
 
 private const val KEY_MOVIE = "movie"
 
+
 @Composable
 fun HomeNavHost(navController: NavHostController, currentScreen: HomeDestination) {
     NavHost(
         navController = navController,
-        startDestination = Movies.route,
+        startDestination = MoviesDestination.route,
     ) {
-        composable(route = Movies.route) {
+        composable(route = MoviesDestination.route) {
             val moviesViewModel = hiltViewModel<MoviesViewModel>()
             MoviesScreen(moviesViewModel, onMovieClicked = { movie ->
-                // Open Movie Details screen for clicked one
                 navController.currentBackStackEntry?.savedStateHandle?.set(KEY_MOVIE, movie)
                 navController.navigate(MovieDetails.route)
             })
@@ -40,8 +40,9 @@ fun HomeNavHost(navController: NavHostController, currentScreen: HomeDestination
 
             }
             MovieDetailsScreen(movie)
-
+        }
+        composable(route = FavoritesDestination.route) {
+            // Add your Favorites screen content here
         }
     }
-
 }
