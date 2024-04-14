@@ -27,7 +27,6 @@ class LocalDBModule {
             AppDatabase::class.java, "movie-db"
         ).build().movieDao()
     }
-
 }
 
 @Database(entities = [MovieLocal::class], version = 1)

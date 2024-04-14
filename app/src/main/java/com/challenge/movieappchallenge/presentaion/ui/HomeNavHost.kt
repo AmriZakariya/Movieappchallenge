@@ -42,7 +42,9 @@ fun HomeNavHost(navController: NavHostController, currentScreen: HomeDestination
             MovieDetailsScreen(movie)
         }
         composable(route = FavoritesDestination.route) {
-            // Add your Favorites screen content here
+            val moviesViewModel = hiltViewModel<MoviesViewModel>()
+            FavoritesListScreen(moviesViewModel)
+
         }
     }
 }
