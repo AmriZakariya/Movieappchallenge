@@ -2,6 +2,7 @@ package com.challenge.movieappchallenge.domain.models
 
 import android.os.Parcelable
 import androidx.annotation.Keep
+import com.challenge.movieappchallenge.data.models.MovieLocal
 import kotlinx.parcelize.Parcelize
 
 @Keep
@@ -17,4 +18,20 @@ data class Movie(
     val voteCount: Int = 0,
     val overview: String = "",
     val releaseDate: String = "",
-) : Parcelable
+) : Parcelable {
+    fun toLocalFavoriteMovie(): MovieLocal {
+        return MovieLocal(
+            id = id,
+            movieId = movieId,
+            name = name,
+            imageUrlSmall = imageUrlSmall,
+            imageUrlFull = imageUrlFull,
+            description = description,
+            voteAverage = voteAverage,
+            voteCount = voteCount,
+            overview = overview,
+            releaseDate = releaseDate,
+            isFavorite = true
+        )
+    }
+}

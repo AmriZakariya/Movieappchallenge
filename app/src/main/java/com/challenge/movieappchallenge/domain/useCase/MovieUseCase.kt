@@ -15,4 +15,9 @@ interface MovieUseCase {
     suspend fun searchMovies(query: String): Flow<PagingData<Movie>>
 
     suspend fun sortMovies(sortingValue: SortingValue): Flow<PagingData<Movie>>
+
+    suspend fun addFavoriteMovie(movie: Movie)
+
+    suspend fun getFavoriteMoviesList(): Flow<PagingData<Movie>>
+
 }

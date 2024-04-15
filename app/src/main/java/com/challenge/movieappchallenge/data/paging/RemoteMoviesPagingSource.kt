@@ -4,6 +4,7 @@ import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.challenge.movieappchallenge.data.local.MoviesDao
 import com.challenge.movieappchallenge.data.mappers.movie.toLocalMovie
+//import com.challenge.movieappchallenge.data.mappers.movie.toLocalMovie
 import com.challenge.movieappchallenge.data.models.MoviesRemoteResponse
 import com.challenge.movieappchallenge.data.remote.RetrofitApi
 import com.challenge.movieappchallenge.data.util.INITIAL_PAGE
@@ -17,6 +18,7 @@ enum class MoviesType {
     POPULAR,
     TOP_RATED,
     SEARCH,
+    FAVORITE,
     NONE
 }
 
@@ -64,6 +66,12 @@ class RemoteMoviesPagingSource(
                 ).movies
 
                 MoviesType.SEARCH -> retrofitApi.searchMovies(
+                    searchQuery,
+                    currentPage,
+                    sortingValue?.sortByValue
+                ).movies
+
+                MoviesType.FAVORITE -> retrofitApi.searchMovies(
                     searchQuery,
                     currentPage,
                     sortingValue?.sortByValue

@@ -15,7 +15,6 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.android.scopes.ViewModelScoped
 
-
 @Module
 @InstallIn(ViewModelComponent::class)
 abstract class MoviesModule {
@@ -29,10 +28,11 @@ abstract class MoviesModule {
     companion object {
         @Provides
         fun providesMoviesRepo(
+            moviesDao: MoviesDao,
             localPagingSource: LocalMoviesPagingSource,
             remotePagingSource: RemoteMoviesPagingSource
         ): MoviesRepositoryImpl {
-            return MoviesRepositoryImpl(localPagingSource, remotePagingSource)
+            return MoviesRepositoryImpl(localPagingSource, remotePagingSource, moviesDao)
         }
     }
 
@@ -64,5 +64,4 @@ class MoviesImpl {
     ): RemoteMoviesPagingSource {
         return RemoteMoviesPagingSource(retrofitApi, moviesDao)
     }
-
 }

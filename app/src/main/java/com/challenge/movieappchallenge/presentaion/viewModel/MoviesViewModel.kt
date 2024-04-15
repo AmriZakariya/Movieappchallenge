@@ -99,4 +99,16 @@ class MoviesViewModel @Inject constructor(private val movieUseCase: MovieUseCase
             _moviesFlow.emit(moviesResult.first())
         }
     }
+
+    private suspend fun addFavoriteMovie(movie: Movie) {
+        viewModelScope.launch {
+            movieUseCase.addFavoriteMovie(movie)
+        }
+    }
+
+    fun addToFavorites(movie: Movie) {
+        viewModelScope.launch {
+            addFavoriteMovie(movie)
+        }
+    }
 }

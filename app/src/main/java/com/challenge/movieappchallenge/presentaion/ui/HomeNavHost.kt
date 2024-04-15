@@ -39,7 +39,8 @@ fun HomeNavHost(navController: NavHostController, currentScreen: HomeDestination
                     ?.get<Movie>(KEY_MOVIE) ?: Movie(id = -1, name = "Not found")
 
             }
-            MovieDetailsScreen(movie)
+            val moviesViewModel = hiltViewModel<MoviesViewModel>()
+            MovieDetailsScreen(movie, moviesViewModel)
         }
         composable(route = FavoritesDestination.route) {
             val moviesViewModel = hiltViewModel<MoviesViewModel>()

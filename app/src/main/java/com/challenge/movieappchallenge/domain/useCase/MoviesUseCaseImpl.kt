@@ -64,4 +64,17 @@ class MoviesUseCaseImpl @Inject constructor(
         }.distinctUntilChanged()
     }
 
+    override suspend fun addFavoriteMovie(movie: Movie) {
+        moviesRepository.addFavoriteMovie(movie)
+    }
+
+
+    override suspend fun getFavoriteMoviesList(): Flow<PagingData<Movie>> {
+        Logger.i(TAG, networkState.isOnline().toString())
+        return moviesRepository.getFavoriteMoviesList().flow.map { moviesList ->
+            moviesList.map { movie ->
+                movie.toMovie()
+            }
+        }.distinctUntilChanged()
+    }
 }

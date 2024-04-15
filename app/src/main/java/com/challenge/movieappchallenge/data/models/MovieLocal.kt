@@ -18,4 +18,5 @@ data class MovieLocal(
     val voteCount: Int = 0,
     val overview: String = "",
     val releaseDate: String = "",
+    val isFavorite: Boolean = false
 )

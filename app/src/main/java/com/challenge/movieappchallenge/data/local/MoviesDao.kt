@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Update
 import com.challenge.movieappchallenge.data.models.MovieLocal
 
 @Dao
@@ -13,7 +14,10 @@ interface MoviesDao {
     suspend fun getMovies(limit: Int, offset: Int): List<MovieLocal>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertMovie(movieLocal: MovieLocal)
+    suspend fun addFavorite(movieLocal: MovieLocal)
+
+    @Update(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun removeFavorite(movieLocal: MovieLocal)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertMovies(movies: List<MovieLocal>)

@@ -5,6 +5,7 @@ import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.animateDp
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.updateTransition
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -16,7 +17,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -32,15 +32,17 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.challenge.movieappchallenge.R
 import com.challenge.movieappchallenge.domain.models.Movie
+import com.challenge.movieappchallenge.presentaion.viewModel.MoviesViewModel
 
 @Composable
-@Preview(showBackground = true)
-fun MovieDetailsScreen(movie: Movie = Movie(id = -1, name = "Dummy", voteAverage = 7.5)) {
+fun MovieDetailsScreen(
+    movie: Movie = Movie(id = -1, name = "Dummy", voteAverage = 7.5),
+    moviesViewModel: MoviesViewModel
+) {
     var isFavorite by remember { mutableStateOf(false) }
     Column(
         Modifier
@@ -71,14 +73,15 @@ fun MovieDetailsScreen(movie: Movie = Movie(id = -1, name = "Dummy", voteAverage
             )
             IconButton(
                 onClick = {
-
+                    isFavorite = !isFavorite
+                    moviesViewModel.addToFavorites(movie)
                 },
                 modifier = Modifier
-                    .size(72.dp)
+                    .size(60.dp)
+                    .padding(12.dp)
                     .align(Alignment.BottomEnd)
-                    .padding(8.dp)
             ) {
-                Icon(
+                Image(
                     painter = painterResource(id = if (isFavorite) R.drawable.remove_favourite else R.drawable.add_favourite),
                     contentDescription = stringResource(id = R.string.favorite_button)
                 )
